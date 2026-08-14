@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a4ca8">
+<title>2026 长江同望粤 · 邀请函批量生成器</title>
+<style>
+@font-face{
+  font-family:"SourceHanSerifCNSemiBoldSubset";
+  src:url("SourceHanSerifCN-SemiBold-subset.woff2") format("woff2");
+  font-style:normal;
+  font-weight:600;
+  font-display:swap;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#061e57;color:#10213f;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+body{min-height:100vh;background:linear-gradient(180deg,#05265f 0,#0b5fc2 50%,#0b92df 100%) fixed}
+.app{width:min(100%,860px);margin:0 auto;padding:20px 14px 48px}
+.hero{padding:6px 4px 18px;text-align:center;color:#fff}
+.title{font-size:30px;font-weight:800;letter-spacing:.04em;margin:6px 0 8px}
+.subtitle{font-size:13px;line-height:1.7;color:rgba(255,255,255,.8);margin:0 auto;max-width:680px}
+.card{background:rgba(255,255,255,.96);border:1px solid rgba(255,224,158,.65);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 12px 30px rgba(0,20,70,.22)}
+.card h3{margin:0 0 12px;font-size:18px;color:#173568}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.input,textarea{width:100%;border:1px solid #b7c9e5;border-radius:12px;background:#fff;color:#10213f;padding:12px 14px;font-size:16px;outline:none;transition:.15s}
+.input:focus,textarea:focus{border-color:#177ddd;box-shadow:0 0 0 3px rgba(23,125,221,.12)}
+.input{height:48px;flex:1 1 260px}
+textarea{min-height:150px;resize:vertical;line-height:1.7}
+button{height:46px;border:0;border-radius:12px;padding:0 18px;background:#0d58b3;color:#fff;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 5px 12px rgba(13,88,179,.2)}
+button:hover{filter:brightness(1.04)}
+button.secondary{background:#ba7b22}
+button.light{background:#66778f}
+button:disabled{opacity:.62;cursor:not-allowed;filter:none}
+.muted{font-size:12px;color:#687b97;line-height:1.75}
+.preview-wrap{display:flex;justify-content:center;overflow:hidden;border-radius:13px;background:#072b6e;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);padding:10px;margin-top:14px}
+.preview-wrap img{display:block;max-width:100%;width:auto;height:auto;max-height:72vh;border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+.batch-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+#batchCount{font-size:13px;color:#687b97}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.item{background:rgba(255,255,255,.97);border:1px solid rgba(255,224,158,.65);border-radius:14px;padding:10px;box-shadow:0 8px 20px rgba(0,20,70,.18)}
+.item h4{margin:0 0 8px;font-size:15px;color:#173568;word-break:break-all}
+.item .thumb{height:480px;border-radius:10px;background:#062b6f;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.item img{display:block;max-width:100%;max-height:100%;width:auto;height:auto}
+.item .actions{display:flex;gap:8px;margin-top:10px}
+.item .actions button{flex:1;height:40px;font-size:13px;border-radius:10px;padding:0 10px}
+.details{margin-top:12px;border-top:1px dashed #cfdaea;padding-top:12px}
+.details summary{cursor:pointer;font-size:13px;color:#526985;user-select:none}
+.tuning{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.tuning label{font-size:11px;color:#687b97}
+.tuning input{width:100%;margin-top:5px;height:38px;border:1px solid #c7d5e9;border-radius:9px;padding:0 8px;font-size:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:20;max-width:88%;text-align:center}
+.toast.show{opacity:1}
+canvas{display:none}
+@media (max-width:640px){
+  .app{padding:14px 10px 36px}.title{font-size:24px}.card{padding:13px}.row>button{width:100%}
+  .batch-toolbar button{flex:1 1 46%}.item .thumb{height:420px}.tuning{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <div class="title">邀请函批量生成器</div>
+    <div class="subtitle">适配 2026「长江同望粤 · 数智赴新程」长图。姓名默认写入“尊敬的：”后的横线位置，输出为 2× 尺寸 JPG。</div>
+  </div>
+
+  <div class="card">
+    <h3>单张生成</h3>
+    <div class="row">
+      <input id="singleNameInput" class="input" maxlength="16" placeholder="请输入姓名，如：房文廷">
+      <button id="singleGenerateBtn">生成单张</button>
+      <button id="singleDownloadBtn" class="secondary">下载当前单张</button>
+    </div>
+    <div class="muted" style="margin-top:9px;">姓名使用思源宋体 CN SemiBold 网页子集（若本地子集文件未放入目录，会自动回退到系统宋体）。</div>
+    <div class="preview-wrap"><img id="singlePreview" src="invitation-bg-2026-hd.webp" alt="邀请函预览"></div>
+
+    <details class="details">
+      <summary>文字位置微调（一般无需修改）</summary>
+      <div class="tuning">
+        <label>中心 X<input id="xInput" type="number" step="0.5" value="188"></label>
+        <label>基线 Y<input id="yInput" type="number" step="0.5" value="817"></label>
+        <label>默认字号<input id="fontSizeInput" type="number" step="0.5" value="18"></label>
+        <label>最大宽度<input id="maxWidthInput" type="number" step="1" value="142"></label>
+      </div>
+      <div class="muted" style="margin-top:8px;">坐标基于原图 425 × 2048。修改后重新生成即可预览。</div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>批量生成</h3>
+    <textarea id="batchNamesInput" placeholder="每行一个姓名，例如：&#10;张三&#10;李四&#10;王五"></textarea>
+    <div class="batch-toolbar">
+      <button id="batchGenerateBtn">批量生成预览</button>
+      <button id="batchDownloadAllBtn" class="secondary">全部下载</button>
+      <button id="clearBatchBtn" class="light">清空结果</button>
+      <div id="batchCount">当前 0 个姓名</div>
+    </div>
+    <div class="muted" style="margin-top:9px;">支持换行、逗号、中文逗号、分号和 Tab 分隔。“全部下载”会逐张触发 JPG 下载；若浏览器拦截多文件下载，可在下方逐张下载。</div>
+  </div>
+
+  <div id="batchResults" class="grid"></div>
+</div>
+
+<canvas id="canvas"></canvas>
+<div id="toast" class="toast">已生成</div>
+<script>
+(function(){
+  'use strict';
+
+  var BG = 'invitation-bg-2026-hd.webp';
+  // 下方坐标仍以原设计稿 425×2048 为参考，实际导出使用高清底图原始尺寸。
+  var BASE_W = 425;
+  var BASE_H = 2048;
+  var DRAW_SCALE_X = 1;
+  var DRAW_SCALE_Y = 1;
+  var NAME_MIN_SIZE = 11;
+  var NAME_FONT_FAMILY = '"SourceHanSerifCNSemiBoldSubset","Source Han Serif CN","Source Han Serif SC","Noto Serif CJK SC","Songti SC","STSong","SimSun",serif';
+
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var toast = document.getElementById('toast');
+  var singleNameInput = document.getElementById('singleNameInput');
+  var singleGenerateBtn = document.getElementById('singleGenerateBtn');
+  var singleDownloadBtn = document.getElementById('singleDownloadBtn');
+  var singlePreview = document.getElementById('singlePreview');
+  var batchNamesInput = document.getElementById('batchNamesInput');
+  var batchGenerateBtn = document.getElementById('batchGenerateBtn');
+  var batchDownloadAllBtn = document.getElementById('batchDownloadAllBtn');
+  var clearBatchBtn = document.getElementById('clearBatchBtn');
+  var batchResults = document.getElementById('batchResults');
+  var batchCount = document.getElementById('batchCount');
+  var xInput = document.getElementById('xInput');
+  var yInput = document.getElementById('yInput');
+  var fontSizeInput = document.getElementById('fontSizeInput');
+  var maxWidthInput = document.getElementById('maxWidthInput');
+
+  var bg = new Image();
+  bg.decoding = 'async';
+  bg.src = BG;
+
+  var currentSingle = null;
+  var currentBatchItems = [];
+
+  function showToast(text, ms){
+    ms = ms || 1600;
+    toast.textContent = text;
+    toast.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(function(){ toast.classList.remove('show'); }, ms);
+  }
+
+  function waitForImage(img){
+    if (img.complete && img.naturalWidth) return Promise.resolve();
+    return new Promise(function(resolve,reject){ img.onload = resolve; img.onerror = reject; });
+  }
+
+  async function ensureFontReady(){
+    if (document.fonts && document.fonts.load){
+      try { await document.fonts.load('600 36px ' + NAME_FONT_FAMILY, '房文廷'); } catch(e) {}
+    }
+  }
+
+  function params(){
+    return {
+      x: Number(xInput.value) || 188,
+      y: Number(yInput.value) || 817,
+      defaultSize: Number(fontSizeInput.value) || 18,
+      maxWidth: Number(maxWidthInput.value) || 142
+    };
+  }
+
+  function setNameFont(baseSize){
+    ctx.font = '600 ' + (baseSize * DRAW_SCALE_Y) + 'px ' + NAME_FONT_FAMILY;
+  }
+
+  function fitFont(text, p){
+    var size = p.defaultSize;
+    while (size > NAME_MIN_SIZE){
+      setNameFont(size);
+      if (ctx.measureText(text).width <= p.maxWidth * DRAW_SCALE_X) break;
+      size -= 0.5;
+    }
+    return size;
+  }
+
+  function canvasToBlob(){
+    return new Promise(function(resolve,reject){
+      canvas.toBlob(function(blob){ blob ? resolve(blob) : reject(new Error('JPG 导出失败')); }, 'image/jpeg', 0.98);
+    });
+  }
+
+  async function renderNameToBlob(name){
+    await waitForImage(bg);
+    await ensureFontReady();
+
+    var p = params();
+    // 直接使用高清底图的原生像素，避免任何先缩小再放大的模糊。
+    canvas.width = bg.naturalWidth;
+    canvas.height = bg.naturalHeight;
+    DRAW_SCALE_X = canvas.width / BASE_W;
+    DRAW_SCALE_Y = canvas.height / BASE_H;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(bg,0,0,canvas.width,canvas.height);
+
+    var size = fitFont(name,p);
+    setNameFont(size);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,48,110,.45)';
+    ctx.shadowBlur = 1.1 * DRAW_SCALE_Y;
+    ctx.shadowOffsetY = 0.35 * DRAW_SCALE_Y;
+    ctx.fillText(name,p.x * DRAW_SCALE_X,p.y * DRAW_SCALE_Y);
+    ctx.shadowColor = 'transparent';
+
+    return canvasToBlob();
+  }
+
+  function revokeItem(item){
+    if (item && item.url && item.url.indexOf('blob:') === 0) URL.revokeObjectURL(item.url);
+  }
+
+  function makeItem(name,blob){
+    return {name:name,blob:blob,url:URL.createObjectURL(blob)};
+  }
+
+  function sanitizeFilename(name){
+    return String(name || '邀请函').replace(/[\\/:*?"<>|]/g,'_').replace(/\s+/g,' ').trim() || '邀请函';
+  }
+
+  function downloadBlob(blob,filename){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1200);
+  }
+
+  function parseNames(raw){
+    return raw.split(/[\n,，;；\t]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+  }
+
+  function updateCount(){
+    batchCount.textContent = '当前 ' + parseNames(batchNamesInput.value).length + ' 个姓名';
+  }
+
+  async function generateSingle(){
+    var name = singleNameInput.value.trim();
+    if (!name){ singleNameInput.focus(); showToast('请先输入姓名'); return null; }
+    singleGenerateBtn.disabled = true;
+    singleGenerateBtn.textContent = '生成中…';
+    try{
+      var blob = await renderNameToBlob(name);
+      revokeItem(currentSingle);
+      currentSingle = makeItem(name,blob);
+      singlePreview.src = currentSingle.url;
+      showToast('单张已生成');
+      return currentSingle;
+    }catch(e){
+      console.error(e); showToast('生成失败，请刷新后重试',1900); return null;
+    }finally{
+      singleGenerateBtn.disabled = false;
+      singleGenerateBtn.textContent = '生成单张';
+    }
+  }
+
+  function clearBatchResultsOnly(){
+    currentBatchItems.forEach(revokeItem);
+    currentBatchItems = [];
+    batchResults.innerHTML = '';
+  }
+
+  async function generateBatch(){
+    var names = parseNames(batchNamesInput.value);
+    if (!names.length){ batchNamesInput.focus(); showToast('请先输入姓名'); return false; }
+
+    batchGenerateBtn.disabled = true;
+    batchGenerateBtn.textContent = '生成中 0/' + names.length;
+    clearBatchResultsOnly();
+
+    try{
+      for (var i=0;i<names.length;i++){
+        batchGenerateBtn.textContent = '生成中 ' + (i+1) + '/' + names.length;
+        var name = names[i];
+        var blob = await renderNameToBlob(name);
+        var data = makeItem(name,blob);
+        currentBatchItems.push(data);
+
+        var item = document.createElement('div');
+        item.className = 'item';
+        var h = document.createElement('h4');
+        h.textContent = (i+1) + '. ' + name;
+        var thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        var im = document.createElement('img');
+        im.src = data.url;
+        im.alt = name + ' 邀请函';
+        thumb.appendChild(im);
+        var actions = document.createElement('div');
+        actions.className = 'actions';
+        var dl = document.createElement('button');
+        dl.textContent = '下载';
+        dl.addEventListener('click',(function(idx,d){ return function(){ downloadBlob(d.blob,(idx+1)+'_'+sanitizeFilename(d.name)+'_邀请函.jpg'); }; })(i,data));
+        var use = document.createElement('button');
+        use.className = 'secondary';
+        use.textContent = '设为单张';
+        use.addEventListener('click',(function(d){ return function(){
+          revokeItem(currentSingle);
+          currentSingle = {name:d.name,blob:d.blob,url:URL.createObjectURL(d.blob)};
+          singlePreview.src = currentSingle.url;
+          singleNameInput.value = d.name;
+          window.scrollTo({top:0,behavior:'smooth'});
+          showToast('已设为单张预览');
+        }; })(data));
+        actions.appendChild(dl); actions.appendChild(use);
+        item.appendChild(h); item.appendChild(thumb); item.appendChild(actions);
+        batchResults.appendChild(item);
+
+        await new Promise(function(r){ setTimeout(r,20); });
+      }
+      showToast('批量生成完成，共 ' + names.length + ' 张');
+      return true;
+    }catch(e){
+      console.error(e); showToast('批量生成失败，请刷新后重试',1900); return false;
+    }finally{
+      batchGenerateBtn.disabled = false;
+      batchGenerateBtn.textContent = '批量生成预览';
+    }
+  }
+
+  async function downloadAllBatch(){
+    if (!currentBatchItems.length){
+      var ok = await generateBatch();
+      if (!ok || !currentBatchItems.length) return;
+    }
+    batchDownloadAllBtn.disabled = true;
+    batchDownloadAllBtn.textContent = '下载中…';
+    try{
+      for (var i=0;i<currentBatchItems.length;i++){
+        var d = currentBatchItems[i];
+        downloadBlob(d.blob,(i+1)+'_'+sanitizeFilename(d.name)+'_邀请函.jpg');
+        await new Promise(function(r){ setTimeout(r,280); });
+      }
+      showToast('已开始批量下载');
+    }catch(e){
+      console.error(e); showToast('批量下载失败，请改为逐张下载',1900);
+    }finally{
+      batchDownloadAllBtn.disabled = false;
+      batchDownloadAllBtn.textContent = '全部下载';
+    }
+  }
+
+  function clearBatch(){
+    clearBatchResultsOnly();
+    batchNamesInput.value = '';
+    updateCount();
+    showToast('已清空');
+  }
+
+  singleGenerateBtn.addEventListener('click',generateSingle);
+  singleDownloadBtn.addEventListener('click',async function(){
+    var name = singleNameInput.value.trim();
+    if (!currentSingle || currentSingle.name !== name){
+      var item = await generateSingle();
+      if (!item) return;
+    }
+    downloadBlob(currentSingle.blob,sanitizeFilename(currentSingle.name)+'_邀请函.jpg');
+  });
+  batchGenerateBtn.addEventListener('click',generateBatch);
+  batchDownloadAllBtn.addEventListener('click',downloadAllBatch);
+  clearBatchBtn.addEventListener('click',clearBatch);
+  batchNamesInput.addEventListener('input',updateCount);
+  singleNameInput.addEventListener('keydown',function(e){ if (e.key === 'Enter') generateSingle(); });
+  window.addEventListener('beforeunload',function(){ revokeItem(currentSingle); currentBatchItems.forEach(revokeItem); });
+  updateCount();
+})();
+</script>
+</body>
+</html>
