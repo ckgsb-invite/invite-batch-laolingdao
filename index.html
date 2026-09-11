@@ -73,7 +73,7 @@ canvas{display:none}
       <button id="singleDownloadBtn" class="secondary">下载当前单张</button>
     </div>
     <div class="muted" style="margin-top:9px;">姓名优先使用内置思源宋体 SemiBold 网页精简版（覆盖 GB2312 常用汉字及常用标点）；未收录的生僻字会回退到系统宋体。</div>
-    <div class="preview-wrap"><img id="singlePreview" src="./invitation-bg-2026-hd.webp" alt="邀请函预览"></div>
+    <div class="preview-wrap"><img id="singlePreview" src="./邀请函-老领导9.11.jpg" alt="邀请函预览"></div>
 
     <details class="details">
       <summary>文字位置微调（一般无需修改）</summary>
@@ -108,7 +108,7 @@ canvas{display:none}
 (function(){
   'use strict';
 
-  var BG = './invitation-bg-2026-hd.webp';
+  var BG = './邀请函-老领导9.11.jpg';
   // 下方坐标仍以原设计稿 425×2048 为参考，实际导出使用高清底图原始尺寸。
   var BASE_W = 425;
   var BASE_H = 2048;
@@ -140,7 +140,7 @@ canvas{display:none}
   bg.src = BG;
   bg.onerror = function(){
     console.error('背景图加载失败：' + BG);
-    showToast('背景图加载失败，请确认 invitation-bg-2026-hd.webp 与 index.html 在同一目录', 3200);
+    showToast('背景图加载失败，请确认 邀请函-老领导9.11.jpg 与 index.html 在同一目录', 3200);
   };
 
   var currentSingle = null;
